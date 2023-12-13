@@ -1,0 +1,28 @@
+version: "3"
+services:
+  # app:
+  #   restart: on-failure
+  #   build: .
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: postgres://user:pass@postgres:5432/db
+  #     NODE_ENV: development
+  #     PORT: 3000
+  #   ports:
+  #     - "3000:3000" # This line maps port 3000 of the app service to port 3000 on the host.
+  #   command: npm run start
+  #   # This block defines two volumes. The first line mounts the current directory on the host to /app in the container. The second line creates a new volume for /app/node_modules in the container.
+  #   volumes:
+  #     - .:/app/
+  #     - /app/node_modules
+
+  postgres:
+    image: postgres:11
+    ports:
+      # maps port 5432 in the container to port 35432 on the host.
+      - "35432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
