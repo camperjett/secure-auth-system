@@ -1,16 +1,19 @@
-require('dotenv').config()
+// const app = require('./app');
 const express = require("express");
 const app = express();
-const db = require("./models");
 const cors = require("cors");
 const session = require('express-session');
+var morgan = require('morgan');
+var winston = require('./configs/winston.configs');
+require('dotenv').config()
 
-const Role = db.role;
 var corsOptions = {
   origin: "http://localhost:8081"
 };
 
 app.use(cors(corsOptions));
+app.use(morgan('combined', { stream: winston.stream }));
+
 
 /*** CORS ***/
 const sessionConfig = session({
@@ -43,6 +46,13 @@ app.use(express.urlencoded({ extended: true }));
 require('./routes/auth.routes')(app);
 require('./routes/user.routes')(app);
 require('./routes/csrf.routes')(app);
+app.get('/', (req, res) => {
+  res.send("Welcome to My auth app.");
+})
+
+// module.exports = app;
+const db = require("./models");
+const Role = db.role;
 
 function init() {
   Role.create({
@@ -60,8 +70,8 @@ function init() {
     name: "admin"
   });
 }
-
 // db.sequelize.sync();
+
 db.sequelize.sync({ force: true }).then(() => {
   console.log("Drop and re-sync db.");
   // this part of code initialize the db
