@@ -1,5 +1,7 @@
 const { authJwt } = require("../middlewares");
 const controller = require("../controllers/user.controller");
+const csrf = require('csurf');
+const csrfProtection = csrf();
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -9,6 +11,7 @@ module.exports = function (app) {
     );
     next();
   });
+  app.use(csrfProtection);
 
   app.get("/api/test/all", controller.allAccess);
 

@@ -1,5 +1,6 @@
 const db = require("../models");
 const config = require("../configs/auth.configs");
+const { body, validationResult } = require('express-validator');
 const User = db.user;
 const Role = db.role;
 const sendEmail = require("../utils/sendEmail");
@@ -10,6 +11,39 @@ var bcrypt = require("bcryptjs");
 
 const PORT = 3000;
 const HOST = '0.0.0.0';
+
+exports.validate = (method) => {
+  // Note that body(...) sanitizes the selected request body param (since v7.0)
+  switch (method) {
+    case 'signup': {
+      return [ // @TODO: Figure out if notEmpty() is always needed? Also what is the best practice for signup validation..?
+        body('username', "username doesn't exists/ match criteria").notEmpty().isAlphanumeric().isLength({ min: 4 }),
+        body('email', "email doesn't exists/ match criteria").notEmpty().isEmail(),
+        body('password', "password doesn't exists/ match criteria").notEmpty().isStrongPassword(),
+        body('roles', "roles doesn't exists/ match criteria").notEmpty(), // @TODO: how to validate this? like choose among the available list of roles..
+      ]
+      break;
+    }
+    case 'signin': {
+      return [
+        body('username', "username doesn't exists/ match criteria").notEmpty().isAlphanumeric().isLength({ min: 4 }),
+        body('password', "password doesn't exists/ match criteria").notEmpty(),
+      ]
+
+    }
+    case 'requestResetPassword': {
+      return [
+        body('email', "email doesn't exists/ match criteria").notEmpty().isEmail(),
+      ]
+    }
+    case 'resetPassword': {
+      return [
+        body('username', "username doesn't exists/ match criteria").notEmpty().isAlphanumeric().isLength({ min: 4 }),
+        body('password', "password doesn't exists/ match criteria").notEmpty().isStrongPassword(),
+      ]
+    }
+  }
+};
 
 exports.signup = async (req, res) => {
   // Save User to Database
